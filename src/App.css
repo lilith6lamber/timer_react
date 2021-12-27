@@ -1,0 +1,32 @@
+body {
+    background: skyblue;
+}
+
+.container {
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 0 12px;
+}
+
+.timer {
+    width: 280px;
+    margin: auto;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.timer .timer_count {
+    padding: 20px;
+}
+
+.timer .timer_controls {
+    display: flex;
+}
+
+.timer .timer_controls button {
+    cursor: pointer;
+    width: 50%;
+}
