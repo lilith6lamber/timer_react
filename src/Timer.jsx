@@ -1,64 +1,58 @@
-/*
-ТЗ:
+import {useState, useEffect, useRef} from "react";
 
-1) Таймер с кнопками старт/стоп и сброс
-2) Надписи на кнопке старт/стоп меняются
-3) Сохранять состояние counter в localStorage
-*/
+function setDefaultValue() {
+    const userData = localStorage.getItem('count');
+    return userData ? +userData : 0
+}
 
-import {Component} from "react";
+function Timer() {
+    const [count, setCount] = useState(setDefaultValue);
+    const [isActive, setStatus] = useState(false);
+    const timerRef = useRef(null);
 
-class Timer extends Component {
-    state = {
-        count: 0,
-        isActive: false
+    function start() {
+        setStatus(true);
     }
 
-    start = () => {
-        this.setState({isActive: true})
-        this.counterId = setInterval(() => {
-            this.setState({count: this.state.count + 1})
-        }, 1000)
+    function pause() {
+        setStatus(false);
     }
 
-    pause = () => {
-        this.setState({isActive: false})
-        clearInterval(this.counterId)
+    function reset() {
+        setCount(0);
+        setStatus(false);
+        clearInterval(timerRef.current)
     }
 
-    reset = () => {
-        this.setState({count: 0, isActive: false})
-        clearInterval(this.counterId)
-    }
+    // update
+    useEffect(() => {
+        localStorage.setItem('count', count)
+    }, [count])
 
-    componentDidMount() {
-        const userData = localStorage.getItem('count');
-        if (userData) {
-            this.setState({count: +userData})
+    useEffect(() => {
+        if (isActive) {
+            timerRef.current = setInterval(() => {
+                setCount((prev) => prev + 1)
+            }, 1000)
         }
-    }
+        return () => {
+            timerRef.current && clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+    }, [isActive])
 
-    componentDidUpdate() {
-        localStorage.setItem('count', this.state.count)
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.counterId)
-    }
-
-    render() {
-        return (
-            <div className='container'>
-                <div className='timer'>
-                    <span className='timer_count'>{this.state.count}</span>
-                    <div className="timer_controls">
-                        {this.state.isActive ? <button className='pause' onClick={this.pause}>Pause</button> : <button className='start' onClick={this.start}>Start</button>}
-                        <button className='reset' onClick={this.reset}>Reset</button>
-                    </div>
+    return (
+        <div className='container'>
+            <div className='timer'>
+                <span className='timer_count'>{count}</span>
+                <div className="timer_controls">
+                    {isActive ? <button className='pause' onClick={pause}>Pause</button> :
+                        <button className='start' onClick={start}>Start</button>}
+                    <button className='reset' onClick={reset}>Reset</button>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default Timer;
